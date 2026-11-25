@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Voice Studio</title>
+<style>
+:root{--bg:#0b1020;--panel:#141c30;--panel2:#1b2740;--text:#eef3ff;--muted:#9eacc8;--accent:#7c5cff;--accent2:#19c6a7;--line:#2b3854}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top right,#1e2850 0,#0b1020 45%);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif;min-height:100vh}
+.wrap{max-width:900px;margin:auto;padding:22px 16px 48px}
+header{display:flex;align-items:center;gap:12px;margin:8px 0 24px}
+.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,var(--accent),#25b7c9);display:grid;place-items:center;font-size:24px}
+h1{font-size:22px;margin:0} .sub{color:var(--muted);font-size:13px;margin-top:3px}
+.card{background:rgba(20,28,48,.94);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 12px 35px #0003}
+.section-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+textarea{width:100%;min-height:190px;resize:vertical;border:1px solid var(--line);border-radius:13px;background:#0d1528;color:var(--text);padding:14px;font:16px/1.8 inherit;outline:none}
+textarea:focus,input:focus,select:focus{border-color:var(--accent)}
+.hint{font-size:12px;color:var(--muted);line-height:1.6;margin-top:9px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:7px}
+select,input[type=range]{width:100%}
+select{background:#0d1528;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px}
+.rangebox{background:#0d1528;border:1px solid var(--line);padding:12px;border-radius:12px}
+.rangehead{display:flex;justify-content:space-between;font-size:13px;margin-bottom:9px}
+input[type=range]{accent-color:var(--accent)}
+.btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+button{border:0;border-radius:12px;padding:13px 15px;font-weight:700;font-size:14px;cursor:pointer;color:white;background:var(--accent)}
+button.secondary{background:var(--panel2);border:1px solid var(--line)}
+button.green{background:#087f6b}
+button:disabled{opacity:.45;cursor:not-allowed}
+.status{font-size:13px;color:var(--muted);margin-top:12px;min-height:20px}
+.note{border-left:3px solid var(--accent2);padding:10px 12px;background:#102b2b;border-radius:8px;color:#c9f6ed;font-size:13px;line-height:1.6}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:16px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.wrap{padding:15px 12px 35px}.card{padding:15px}h1{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo">🎙️</div>
+  <div><h1>AI Voice Studio</h1><div class="sub">Hindi • Documentary • Storytelling</div></div>
+</header>
+
+<div class="card">
+  <div class="section-title"><span>अपना टेक्स्ट लिखें</span><span id="count" class="sub">0 शब्द</span></div>
+  <textarea id="script" placeholder="यहाँ अपनी हिंदी या Hinglish स्क्रिप्ट लिखें...
+
+उदाहरण: भारत में टेक्नोलॉजी की दुनिया तेजी से बदल रही है।"></textarea>
+  <div class="hint">बेहतर उच्चारण के लिए लंबे वाक्यों को छोटे वाक्यों में बाँटें। विराम के लिए कॉमा और पूर्ण विराम लगाएँ।</div>
+</div>
+
+<div class="card">
+  <div class="section-title">आवाज़ और भाषा</div>
+  <div class="grid">
+    <div><label for="gender">Voice Type</label><select id="gender"><option value="male">Male Voice</option><option value="female">Female Voice</option><option value="all">All Available Voices</option></select></div>
+    <div><label for="lang">Text mode</label><select id="lang"><option value="hi-IN">Hindi</option><option value="en-IN">English (India)</option></select></div>
+    <div style="grid-column:1/-1"><label for="voice">Available Voice चुनें</label><select id="voice"><option value="">Default Hindi Voice</option></select></div>
+  </div>
+  <div class="hint" id="voiceHint">आपके डिवाइस में उपलब्ध आवाज़ें यहाँ दिखेंगी। आवाज़ों की गुणवत्ता ब्राउज़र और डिवाइस पर निर्भर करती है।</div>
+</div>
+
+<div class="card">
+  <div class="section-title">Voice Settings</div>
+  <div class="grid">
+    <div class="rangebox"><div class="rangehead"><label for="rate">Speed</label><strong id="rateVal">0.90x</strong></div><input id="rate" type="range" min="0.65" max="1.25" step="0.05" value="0.9"></div>
+    <div class="rangebox"><div class="rangehead"><label for="pitch">Pitch</label><strong id="pitchVal">0.85</strong></div><input id="pitch" type="range" min="0.6" max="1.4" step="0.05" value="0.85"></div>
+  </div>
+  <div class="hint">कम Speed और Pitch कुछ आवाज़ों को गहरा महसूस करा सकते हैं; हर डिवाइस पर परिणाम अलग होगा।</div>
+</div>
+
+<div class="card">
+  <div class="section-title">Pronunciation Helper</div>
+  <label for="replace">गलत पढ़े जाने वाले शब्द का विकल्प (एक शब्द → दूसरा शब्द)</label>
+  <div class="grid">
+    <input id="replace" placeholder="जैसे: Temple" style="background:#0d1528;color:white;border:1px solid var(--line);padding:12px;border-radius:10px">
+    <input id="replacement" placeholder="जैसे: टेम्पल" style="background:#0d1528;color:white;border:1px solid var(--line);padding:12px;border-radius:10px">
+  </div>
+  <div class="hint">यह बदलाव सिर्फ आवाज़ में पढ़े जाने वाले टेक्स्ट पर लागू होगा; आपका मूल टेक्स्ट नहीं बदलेगा।</div>
+</div>
+
+<div class="card">
+  <div class="section-title">Generate Voice</div>
+  <div class="btns">
+    <button id="play">▶ Play Voice</button>
+    <button id="pause" class="secondary">Ⅱ Pause</button>
+    <button id="resume" class="secondary">▶ Resume</button>
+    <button id="stop" class="secondary">■ Stop</button>
+    <button id="download" class="green">⬇ Download Audio</button>
+  </div>
+  <div class="status" id="status" role="status">अपना टेक्स्ट लिखें और Play Voice दबाएँ।</div>
+</div>
+
+<div class="note">ध्यान दें: Male/Female voice आपके मोबाइल या कंप्यूटर में installed system voices में से चुनी जाएगी। Browser की सामान्य Speech सुविधा ऑडियो को MP3/WAV फाइल के रूप में export नहीं करती। Download बटन अभी इसी सीमा की जानकारी देगा; असली audio download के लिए अलग TTS engine/backend जोड़ना होगा।</div>
+<footer>AI Voice Studio • Free browser version</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const synth = window.speechSynthesis;
+let voices = [];
+
+function updateCount(){
+  const text = $('script').value.trim();
+  const words = text ? text.split(/\s+/).length : 0;
+  $('count').textContent = words + ' शब्द';
+}
+$('script').addEventListener('input', updateCount);
+$('gender').addEventListener('change', refreshVoiceList);
+$('lang').addEventListener('change', refreshVoiceList);
+$('rate').addEventListener('input', ()=>$('rateVal').textContent=Number($('rate').value).toFixed(2)+'x');
+$('pitch').addEventListener('input', ()=>$('pitchVal').textContent=Number($('pitch').value).toFixed(2));
+
+function looksMale(v){
+  return /male|man|david|mark|daniel|alex|aarav|ravi|amit|heera|hemant|rishi/i.test(v.name);
+}
+function looksFemale(v){
+  return /female|woman|zira|samantha|karen|susan|priya|neerja|lekha/i.test(v.name);
+}
+function loadVoices(){
+  voices = synth ? synth.getVoices() : [];
+  refreshVoiceList();
+}
+function refreshVoiceList(){
+  const select = $('voice');
+  if(!select) return;
+  const lang = $('lang').value;
+  const gender = $('gender').value;
+  let candidates = voices.filter(v => v.lang.toLowerCase().startsWith(lang.slice(0,2).toLowerCase()));
+  if(gender === 'male'){
+    const matched = candidates.filter(looksMale);
+    if(matched.length) candidates = matched;
+  } else if(gender === 'female'){
+    const matched = candidates.filter(looksFemale);
+    if(matched.length) candidates = matched;
+  }
+  select.innerHTML = '';
+  if(!candidates.length){
+    const option=document.createElement('option');
+    option.value='';
+    option.textContent='इस भाषा की voice उपलब्ध नहीं';
+    select.appendChild(option);
+  } else {
+    candidates.forEach(v=>{
+      const option=document.createElement('option');
+      option.value=v.name;
+      option.textContent=v.name+' ('+v.lang+')';
+      select.appendChild(option);
+    });
+  }
+  const hindiCount = voices.filter(v => /^hi/i.test(v.lang)).length;
+  $('voiceHint').textContent = hindiCount
+    ? hindiCount+' Hindi system voice उपलब्ध हैं। Male/Female पहचान voice के नाम से अनुमानित है; हर डिवाइस पर सही label उपलब्ध नहीं होता।'
+    : 'Hindi system voice नहीं मिली। Android की Text-to-Speech settings में Hindi voice install करें।';
+}
+if ('speechSynthesis' in window) {
+  loadVoices();
+  synth.onvoiceschanged=loadVoices;
+} else {
+  $('status').textContent='इस ब्राउज़र में Speech Synthesis उपलब्ध नहीं है। Chrome में खोलकर देखें।';
+  $('play').disabled=true;
+}
+function getSpeechText(){
+  let text=$('script').value.trim();
+  const from=$('replace').value.trim();
+  const to=$('replacement').value.trim();
+  if(from && to) text=text.replace(new RegExp(from.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),to);
+  return text;
+}
+$('play').addEventListener('click',()=>{
+  const text=getSpeechText();
+  if(!text){$('status').textContent='पहले टेक्स्ट लिखें।';return;}
+  if(!synth){$('status').textContent='आपका ब्राउज़र voice generation सपोर्ट नहीं करता।';return;}
+  synth.cancel();
+  const utterance=new SpeechSynthesisUtterance(text);
+  utterance.lang=$('lang').value;
+  utterance.rate=Number($('rate').value);
+  utterance.pitch=Number($('pitch').value);
+  const chosen=voices.find(v=>v.name===$('voice').value);
+  if(chosen) utterance.voice=chosen;
+  utterance.onstart=()=>$('status').textContent='आवाज़ चल रही है…';
+  utterance.onend=()=>$('status').textContent='पढ़ना पूरा हुआ।';
+  utterance.onerror=e=>$('status').textContent='Voice error: '+e.error;
+  synth.speak(utterance);
+});
+$('pause').addEventListener('click',()=>{if(synth.speaking)synth.pause();$('status').textContent='Paused';});
+$('resume').addEventListener('click',()=>{synth.resume();$('status').textContent='फिर से चल रहा है…';});
+$('stop').addEventListener('click',()=>{synth.cancel();$('status').textContent='Voice रोक दी गई।';});
+$('download').addEventListener('click',()=>{
+  $('status').textContent='Browser की सामान्य Speech voice को सीधे MP3/WAV में डाउनलोड नहीं किया जा सकता। Audio download के लिए अलग TTS engine जोड़ना होगा।';
+});
+</script>
+</body>
+</html>
